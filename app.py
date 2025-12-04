@@ -1,18 +1,36 @@
 from flask import Flask
+from flask_login import LoginManager, current_user
 import os
-from routes import main
+from routes import main, users
 from services.database_service import get_db
+from services.user_service import get_user_by_id
 
 
 def create_app():
     app = Flask(__name__)
+    app.secret_key = os.getenv("FLASK_SECRET_KEY", "n'importe")
     app.register_blueprint(main.bp)
+    app.register_blueprint(users.bp)
+    login_manager = LoginManager()
+    login_manager.init_app(app)
+    login_manager.login_view = 'users.login'
+
+    @login_manager.user_loader
+    def load_user(user_id: str):
+        try:
+            return get_user_by_id(int(user_id))
+        except Exception:
+            return None
 
     from services.database_service import get_db, init_app
+    from models.users import initialize_users_table
     init_app(app)
+    
     
     with app.app_context():
         db = get_db()
+        # Ensure required tables exist
+        initialize_users_table()
         row = db.execute("SELECT datetime('now') AS utc_time").fetchone()
         print({"utc_time": row["utc_time"]})
 
