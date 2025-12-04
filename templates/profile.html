@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Profil</title>
+        <style>
+            body { font-family: Arial, sans-serif; padding: 24px; }
+            .container { max-width: 720px; margin: 0 auto; }
+            table { border-collapse: collapse; width: 100%; }
+            th, td { text-align: left; padding: 8px; border-bottom: 1px solid #e5e7eb; }
+            .actions { margin-top: 16px; }
+            .btn { padding: 10px 14px; background: #1f2937; color: #fff; border: none; cursor: pointer; text-decoration: none; display: inline-block; }
+            a { color: #2563eb; text-decoration: none; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Profil</h1>
+            <p>Connecté en tant que <strong>{{ user.email }}</strong> (role: {{ user.role }})</p>
+
+            <table>
+                <tbody>
+                    <tr><th>ID</th><td>{{ user.user_id }}</td></tr>
+                    <tr><th>Prénom</th><td>{{ user.first_name or '' }}</td></tr>
+                    <tr><th>Nom</th><td>{{ user.last_name or '' }}</td></tr>
+                    <tr><th>Age</th><td>{{ user.age or '' }}</td></tr>
+                    <tr><th>Genre</th><td>{{ user.gender or '' }}</td></tr>
+                    <tr><th>Pays</th><td>{{ user.country or '' }}</td></tr>
+                    <tr><th>État / Province</th><td>{{ user.state_province or '' }}</td></tr>
+                    <tr><th>Ville</th><td>{{ user.city or '' }}</td></tr>
+                    <tr><th>Abonnement</th><td>{{ user.subscription_plan or '' }}</td></tr>
+                    <tr><th>Début abonnement</th><td>{{ user.subscription_start_date or '' }}</td></tr>
+                    <tr><th>Actif</th><td>{{ 'Oui' if user.is_active else 'Non' }}</td></tr>
+                    <tr><th>Dépense mensuelle</th><td>{{ user.monthly_spend or '' }}</td></tr>
+                    <tr><th>Appareil principal</th><td>{{ user.primary_device or '' }}</td></tr>
+                    <tr><th>Taille du foyer</th><td>{{ user.household_size or '' }}</td></tr>
+                    <tr><th>Créé le</th><td>{{ user.created_at }}</td></tr>
+                </tbody>
+            </table>
+
+            <div class="actions">
+                <a class="btn" href="{{ url_for('users.logout') }}">Se déconnecter</a>
+                <a style="margin-left: 8px;" href="{{ url_for('main.home') }}">Accueil</a>
+            </div>
+        </div>
+    </body>
+</html>
+
