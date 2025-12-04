@@ -1,15 +1,273 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Movies</h1>
 
-<ul>
+<style>
+    .movie-card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+        background: white;
+    }
+    
+    .movie-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    }
+    
+    .movie-card img {
+        width: 100%;
+        height: 320px;
+        object-fit: cover;
+    }
+    
+    .movie-card .card-body {
+        padding: 16px;
+    }
+    
+    .movie-card .card-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        min-height: 48px;
+    }
+    
+    .movie-card .card-text {
+        font-size: 14px;
+        color: #6c757d;
+    }
+    
+    .modal-poster {
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .modal-content {
+        border-radius: 16px;
+        border: none;
+    }
+    
+    .modal-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 16px 16px 0 0;
+    }
+    
+    .modal-title {
+        font-weight: 600;
+    }
+    
+    .btn-close {
+        filter: brightness(0) invert(1);
+    }
+    
+    .list-group-item {
+        border-left: none;
+        border-right: none;
+        padding: 12px 0;
+    }
+    
+    .list-group-item:first-child {
+        border-top: none;
+    }
+    
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+    
+    .badge-netflix {
+        background-color: #e50914;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    
+    .pagination .page-link {
+        color: #333;                 /* Dark text always visible */
+        background: #fff;            /* White background */
+        border: 1px solid #ccc;      /* Light neutral border */
+    }
+
+    .pagination .page-item.active .page-link {
+        background: #e5e5e5;         /* Light grey for active page */
+        border-color: #bfbfbf;
+        color: #000;                 /* Black text for contrast */
+    }
+
+    .pagination .page-link:hover {
+        background: #f2f2f2;         /* Soft hover color */
+        color: #000;
+    }
+
+    .pagination .page-item.disabled .page-link {
+        color: #999;                 /* Muted text */
+        background: #f9f9f9;         /* Slight grey background */
+        border-color: #ddd;
+        pointer-events: none;
+    }
+</style>
+
+<h1 class="mb-4 fw-bold">Films et Séries</h1>
+
+<!-- GRID OF CARDS -->
+<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4 mb-5">
     {% for m in movies %}
-        <li>
-            <strong>{{ m.title }}</strong>
-            {% if m.release_year %} ({{ m.release_year }}){% endif %}
-            — {{ m.content_type }}
-        </li>
+    <div class="col">
+        <div class="card movie-card h-100" data-bs-toggle="modal" data-bs-target="#movieModal_{{ m.movie_id }}">
+            {% if m.poster %}
+            <img src="{{ m.poster }}" class="card-img-top" alt="{{ m.title }}">
+            {% else %}
+            <div class="bg-secondary d-flex align-items-center justify-content-center" style="height: 320px;">
+                <span class="text-white fs-1">🎬</span>
+            </div>
+            {% endif %}
+
+            <div class="card-body">
+                <h5 class="card-title">{{ m.title }}</h5>
+                <div class="d-flex justify-content-between align-items-center">
+                    {% if m.release_year %}
+                    <p class="card-text mb-0">{{ m.release_year }}</p>
+                    {% endif %}
+                    {% if m.imdb_rating %}
+                    <span class="text-warning fw-bold">⭐ {{ m.imdb_rating }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
     {% endfor %}
-</ul>
+</div>
+
+<!-- PAGINATION -->
+<div class="d-flex justify-content-center mb-4">
+    <nav>
+        <ul class="pagination">
+            <!-- Previous button -->
+            <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                <a class="page-link" href="?page={{ page - 1 }}">Précédent</a>
+            </li>
+
+            <li class="page-item active">
+                <span class="page-link">Page {{ page }}</span>
+            </li>
+
+            <!-- Next button -->
+            <li class="page-item {% if not has_next %}disabled{% endif %}">
+                <a class="page-link" href="?page={{ page + 1 }}">Suivant</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+
+<!-- MOVIE MODALS -->
+{% for m in movies %}
+<div class="modal fade" id="movieModal_{{ m.movie_id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="modal-title">{{ m.title }}</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body p-4">
+                <div class="row">
+
+                    <div class="col-md-4 mb-3 mb-md-0">
+                        {% if m.poster %}
+                        <img src="{{ m.poster }}" class="img-fluid modal-poster" alt="{{ m.title }}">
+                        {% else %}
+                        <div class="bg-secondary d-flex align-items-center justify-content-center modal-poster" style="aspect-ratio: 2/3;">
+                            <span class="text-white" style="font-size: 64px;">🎬</span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-8">
+                        <ul class="list-group list-group-flush">
+
+                            {% if m.is_netflix_original %}
+                            <li class="list-group-item">
+                                <span class="badge-netflix">NETFLIX ORIGINAL</span>
+                            </li>
+                            {% endif %}
+
+                            {% if m.release_year %}
+                            <li class="list-group-item"><strong>Année:</strong> {{ m.release_year }}</li>
+                            {% endif %}
+
+                            <li class="list-group-item"><strong>Type:</strong> {{ m.content_type }}</li>
+
+                            {% if m.genre_primary %}
+                            <li class="list-group-item">
+                                <strong>Genre:</strong> {{ m.genre_primary }}{% if m.genre_secondary %}, {{ m.genre_secondary }}{% endif %}
+                            </li>
+                            {% endif %}
+
+                            {% if m.duration_minutes %}
+                            <li class="list-group-item"><strong>Durée:</strong> {{ m.duration_minutes }} min</li>
+                            {% endif %}
+
+                            {% if m.number_of_seasons %}
+                            <li class="list-group-item">
+                                <strong>Saisons:</strong> {{ m.number_of_seasons }}
+                                {% if m.number_of_episodes %} ({{ m.number_of_episodes }} épisodes){% endif %}
+                            </li>
+                            {% endif %}
+
+                            {% if m.language %}
+                            <li class="list-group-item"><strong>Langue:</strong> {{ m.language }}</li>
+                            {% endif %}
+
+                            {% if m.country_of_origin %}
+                            <li class="list-group-item"><strong>Pays:</strong> {{ m.country_of_origin }}</li>
+                            {% endif %}
+
+                            {% if m.rating %}
+                            <li class="list-group-item"><strong>Classification:</strong> {{ m.rating }}</li>
+                            {% endif %}
+
+                            {% if m.imdb_rating %}
+                            <li class="list-group-item"><strong>Note IMDb:</strong> ⭐ {{ m.imdb_rating }}/10</li>
+                            {% endif %}
+
+                            {% if m.production_budget %}
+                            <li class="list-group-item"><strong>Budget:</strong> ${{ "{:,.0f}".format(m.production_budget) }}</li>
+                            {% endif %}
+
+                            {% if m.box_office_revenue %}
+                            <li class="list-group-item"><strong>Box Office:</strong> ${{ "{:,.0f}".format(m.box_office_revenue) }}</li>
+                            {% endif %}
+
+                            {% if m.added_to_platform %}
+                            <li class="list-group-item"><strong>Ajouté le:</strong> {{ m.added_to_platform }}</li>
+                            {% endif %}
+
+                            {% if m.content_warning %}
+                            <li class="list-group-item">
+                                <span class="badge bg-warning text-dark">⚠️ Contenu sensible</span>
+                            </li>
+                            {% endif %}
+
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endfor %}
+
 {% endblock %}
