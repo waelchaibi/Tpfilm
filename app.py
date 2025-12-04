@@ -11,7 +11,7 @@ def create_app():
     app = Flask(__name__)
     app.secret_key = os.getenv("FLASK_SECRET_KEY", "n'importe")
     app.register_blueprint(main.bp)
-    app.register_blueprint(movie_route.bp)
+    
     app.register_blueprint(users.bp)
     login_manager = LoginManager()
     login_manager.init_app(app)
@@ -38,6 +38,8 @@ def create_app():
         movie_service = movieService()
         movie_service.create_movie_table()
         movie_service.seed_movies_from_csv('./data/movies.csv')
+    
+    app.register_blueprint(movie_route.bp)
     return app
 
 app = create_app()
