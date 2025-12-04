@@ -1,6 +1,6 @@
 movie_id,title,content_type,genre_primary,genre_secondary,release_year,duration_minutes,rating,language,country_of_origin,imdb_rating,production_budget,box_office_revenue,number_of_seasons,number_of_episodes,is_netflix_original,added_to_platform,content_warning
 movie_0001,Dragon Legend,Stand-up Comedy,History,Thriller,2014,35.0,TV-Y,French,Japan,,,,,,False,2023-08-07,False
-movie_0002,Storm Warrior,Stand-up Comedy,Sci-Fi,,2017,37.0,PG,Japanese,USA,3.3,,,,,False,2022-01-28,True
+movie_0001,Storm Warrior,Stand-up Comedy,Sci-Fi,,2017,37.0,PG,Japanese,USA,3.3,,,,,False,2022-01-28,True
 movie_0003,Fire Family,Movie,Drama,,2003,142.0,TV-MA,English,USA,8.5,2114120.0,,,,False,2021-05-04,True
 movie_0004,Our Princess,Documentary,Sci-Fi,,2011,131.0,NC-17,Japanese,USA,5.3,,,,,False,2022-11-26,False
 movie_0005,Warrior Mission,Documentary,Sport,Mystery,2015,91.0,TV-G,English,USA,3.1,,,,,False,2023-06-15,False

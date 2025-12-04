@@ -1,15 +1,17 @@
 from flask import Flask
 from flask_login import LoginManager, current_user
 import os
-from routes import main, users
+from routes import main, movie_route, users
 from services.database_service import get_db
 from services.user_service import get_user_by_id
+from services.movie_service import movieService
 
 
 def create_app():
     app = Flask(__name__)
     app.secret_key = os.getenv("FLASK_SECRET_KEY", "n'importe")
     app.register_blueprint(main.bp)
+    app.register_blueprint(movie_route.bp)
     app.register_blueprint(users.bp)
     login_manager = LoginManager()
     login_manager.init_app(app)
@@ -33,7 +35,9 @@ def create_app():
         initialize_users_table()
         row = db.execute("SELECT datetime('now') AS utc_time").fetchone()
         print({"utc_time": row["utc_time"]})
-
+        movie_service = movieService()
+        movie_service.create_movie_table()
+        movie_service.seed_movies_from_csv('./data/movies.csv')
     return app
 
 app = create_app()
