@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Movies</h1>
+
+<ul>
+    {% for m in movies %}
+        <li>
+            <strong>{{ m.title }}</strong>
+            {% if m.release_year %} ({{ m.release_year }}){% endif %}
+            — {{ m.content_type }}
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}
