@@ -1,13 +1,16 @@
+from dotenv import load_dotenv
 from flask import Flask
 from flask_login import LoginManager, current_user
 import os
-from routes import main, movie_route, users
+from routes import main, users
+from routes.movie_route import create_movie_blueprint
 from services.database_service import get_db
 from services.user_service import get_user_by_id
 from services.movie_service import movieService
 
 
 def create_app():
+    load_dotenv()
     app = Flask(__name__)
     app.secret_key = os.getenv("FLASK_SECRET_KEY", "n'importe")
     app.register_blueprint(main.bp)
@@ -31,15 +34,14 @@ def create_app():
     
     with app.app_context():
         db = get_db()
-        # Ensure required tables exist
         initialize_users_table()
         row = db.execute("SELECT datetime('now') AS utc_time").fetchone()
         print({"utc_time": row["utc_time"]})
-        movie_service = movieService()
+        movie_service = movieService(os.getenv("MOVIE_SERVICE_API_KEY"))
         movie_service.create_movie_table()
-        movie_service.seed_movies_from_csv('./data/movies.csv')
+        movie_service.seed_movies_from_csv('./data/netflix_titles.csv')
     
-    app.register_blueprint(movie_route.bp)
+        app.register_blueprint(create_movie_blueprint(movie_service))
     return app
 
 app = create_app()
