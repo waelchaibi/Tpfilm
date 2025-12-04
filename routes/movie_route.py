@@ -1,28 +1,26 @@
 from flask import Blueprint, render_template, request
-from services.movie_service import movieService
 
-bp = Blueprint('movie', __name__)
+def create_movie_blueprint(movie_service):
+    bp = Blueprint('movie', __name__)
 
-@bp.route('/movies')
-def movies():
-    service = movieService()
-    page_size = 20
-    page_arg = request.args.get('page', '1')
-    try:
-        page = int(page_arg)
-        if page < 1:
-            page = 1
-    except ValueError:
-        page = 1
+    @bp.route('/movies')
+    def movies():
+        page = request.args.get('page', 1, type=int)
 
-    movies_fetched = service.get_movies_paginated(page=page, page_size=page_size + 1)
+        movies_list, has_next = movie_service.get_movies_paginated(
+            page=page,
+            page_size=20,
+            consolidate=True
+        )
 
-    has_next = len(movies_fetched) > page_size
-    movies = movies_fetched[:page_size]  # show only page_size items
+        stats = movie_service.get_consolidation_stats()
 
-    return render_template(
-        "movies.html",
-        movies=movies,
-        page=page,
-        has_next=has_next
-    )
+        return render_template(
+            'movies.html',
+            movies=movies_list,
+            page=page,
+            has_next=has_next,
+            stats=stats
+        )
+
+    return bp

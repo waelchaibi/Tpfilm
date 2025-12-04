@@ -1,27 +1,35 @@
 class movie:
-    def __init__(self, movie_id, title, content_type, genre_primary,
-                 genre_secondary=None, release_year=None, duration_minutes=None,
-                 rating=None, language=None, country_of_origin=None,
-                 imdb_rating=None, production_budget=None, box_office_revenue=None,
-                 number_of_seasons=None, number_of_episodes=None,
-                 is_netflix_original=False, added_to_platform=None,
-                 content_warning=False, poster=None):
-        self.movie_id = movie_id
+    def __init__(self, show_id, type, title, director, cast, country, 
+                 date_added, release_year, rating, duration, listed_in, 
+                 description,
+                 imdb_rating=None, imdb_votes=None, runtime=None, 
+                 genre=None, language=None, awards=None, box_office=None,
+                 poster=None, production=None, website=None,
+                 last_updated=None, omdb_data_available=False):
+        
+        self.show_id = show_id
+        self.type = type
         self.title = title
-        self.content_type = content_type
-        self.genre_primary = genre_primary
-        self.genre_secondary = genre_secondary
+        self.director = director
+        self.cast = cast
+        self.country = country
+        self.date_added = date_added
         self.release_year = release_year
-        self.duration_minutes = duration_minutes
         self.rating = rating
-        self.language = language
-        self.country_of_origin = country_of_origin
+        self.duration = duration
+        self.listed_in = listed_in
+        self.description = description
+        
         self.imdb_rating = imdb_rating
-        self.production_budget = production_budget
-        self.box_office_revenue = box_office_revenue
-        self.number_of_seasons = number_of_seasons
-        self.number_of_episodes = number_of_episodes
-        self.is_netflix_original = is_netflix_original
-        self.added_to_platform = added_to_platform
-        self.content_warning = content_warning
+        self.imdb_votes = imdb_votes
+        self.runtime = runtime
+        self.genre = genre
+        self.language = language
+        self.awards = awards
+        self.box_office = box_office
         self.poster = poster
+        self.production = production
+        self.website = website
+        
+        self.last_updated = last_updated
+        self.omdb_data_available = omdb_data_available

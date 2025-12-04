@@ -7,4 +7,6 @@ requires-python = ">=3.12"
 dependencies = [
     "flask>=3.1.2",
     "flask-login>=0.6.3",
+    "python-dotenv>=1.2.1",
+    "requests>=2.32.5",
 ]
