@@ -3,7 +3,6 @@
 {% block content %}
 
 <style>
-    /* Your existing CSS styles remain the same */
     .movie-card {
         border: none;
         border-radius: 12px;
@@ -167,9 +166,110 @@
         border-color: #ddd;
         pointer-events: none;
     }
+
+    .search-container {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .search-input {
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 12px 16px;
+        font-size: 16px;
+        transition: border-color 0.3s ease;
+    }
+
+    .search-input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        outline: none;
+    }
+
+    .search-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 12px 24px;
+        color: white;
+        font-weight: 600;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .search-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .clear-btn {
+        background: #6c757d;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 20px;
+        color: white;
+        font-weight: 500;
+        transition: background 0.2s ease;
+    }
+
+    .clear-btn:hover {
+        background: #5a6268;
+    }
+
+    .search-results-info {
+        background: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-weight: 500;
+        color: #1565c0;
+    }
 </style>
 
 <h1 class="mb-4 fw-bold">📺 Films et Séries Netflix</h1>
+
+<!-- Search Bar -->
+<div class="search-container">
+    <form method="GET" action="/movies" class="row g-3 align-items-center">
+        <div class="col-md-8">
+            <input 
+                type="text" 
+                name="search" 
+                class="form-control search-input" 
+                placeholder="🔍 Rechercher un film ou une série par titre..."
+                value="{{ search_query if search_query else '' }}"
+            >
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn search-btn w-100">
+                Rechercher
+            </button>
+        </div>
+        <div class="col-md-2">
+            {% if search_query %}
+            <a href="/movies" class="btn clear-btn w-100">
+                Effacer
+            </a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- Search Results Info -->
+{% if search_query %}
+<div class="search-results-info">
+    📋 Résultats de recherche pour : <strong>"{{ search_query }}"</strong>
+    {% if movies|length == 0 %}
+    - Aucun résultat trouvé
+    {% else %}
+    - {{ movies|length }} résultat(s) sur cette page
+    {% endif %}
+</div>
+{% endif %}
 
 <!-- Consolidation Statistics -->
 <div class="stats-card">
@@ -241,7 +341,7 @@
         <ul class="pagination">
             <!-- Previous button -->
             <li class="page-item {% if page <= 1 %}disabled{% endif %}">
-                <a class="page-link" href="?page={{ page - 1 }}">Précédent</a>
+                <a class="page-link" href="?page={{ page - 1 }}{% if search_query %}&search={{ search_query }}{% endif %}">Précédent</a>
             </li>
 
             <li class="page-item active">
@@ -250,7 +350,7 @@
 
             <!-- Next button -->
             <li class="page-item {% if not has_next %}disabled{% endif %}">
-                <a class="page-link" href="?page={{ page + 1 }}">Suivant</a>
+                <a class="page-link" href="?page={{ page + 1 }}{% if search_query %}&search={{ search_query }}{% endif %}">Suivant</a>
             </li>
         </ul>
     </nav>

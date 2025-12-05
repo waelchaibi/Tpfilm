@@ -6,12 +6,21 @@ def create_movie_blueprint(movie_service):
     @bp.route('/movies')
     def movies():
         page = request.args.get('page', 1, type=int)
+        search_query = request.args.get('search', '', type=str).strip()
 
-        movies_list, has_next = movie_service.get_movies_paginated(
-            page=page,
-            page_size=20,
-            consolidate=True
-        )
+        if search_query:
+            movies_list, has_next = movie_service.search_movies(
+                query=search_query,
+                page=page,
+                page_size=20,
+                consolidate=True
+            )
+        else:
+            movies_list, has_next = movie_service.get_movies_paginated(
+                page=page,
+                page_size=20,
+                consolidate=True
+            )
 
         stats = movie_service.get_consolidation_stats()
 
@@ -20,7 +29,8 @@ def create_movie_blueprint(movie_service):
             movies=movies_list,
             page=page,
             has_next=has_next,
-            stats=stats
+            stats=stats,
+            search_query=search_query
         )
 
     return bp

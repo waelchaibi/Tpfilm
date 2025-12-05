@@ -119,6 +119,40 @@ class movieService:
             db.commit()
             return False, f"OMDB error: {omdb_data.get('error', 'Unknown error')}"
     
+    def search_movies(self, query: str, page: int = 1, page_size: int = 20, consolidate: bool = True) -> tuple[list[movie], bool]:
+        db = get_db()
+        offset = (page - 1) * page_size
+        search_pattern = f"%{query}%"
+        
+        rows = db.execute(
+            "SELECT * FROM movies WHERE title LIKE ? ORDER BY title ASC LIMIT ? OFFSET ?",
+            (search_pattern, page_size, offset)
+        ).fetchall()
+        
+        movies = []
+        for r in rows:
+            if consolidate:
+                self.consolidate_movie(r['show_id'])
+                r = db.execute("SELECT * FROM movies WHERE show_id = ?", (r['show_id'],)).fetchone()
+            
+            movies.append(movie(
+                show_id=r['show_id'], type=r['type'], title=r['title'], director=r['director'],
+                cast=r['cast'], country=r['country'], date_added=r['date_added'],
+                release_year=r['release_year'], rating=r['rating'], duration=r['duration'],
+                listed_in=r['listed_in'], description=r['description'],
+                imdb_rating=r['imdb_rating'], imdb_votes=r['imdb_votes'], runtime=r['runtime'],
+                genre=r['genre'], language=r['language'], awards=r['awards'],
+                box_office=r['box_office'], poster=r['poster'], production=r['production'],
+                website=r['website'], last_updated=r['last_updated'],
+                omdb_data_available=bool(r['omdb_data_available'])
+            ))
+        
+        total = db.execute(
+            "SELECT COUNT(*) AS c FROM movies WHERE title LIKE ?",
+            (search_pattern,)
+        ).fetchone()['c']
+        
+        return movies, (page * page_size) < total
 
     def get_movies_paginated(self, page: int = 1, page_size: int = 20, consolidate: bool = True) -> tuple[list[movie], bool]:
         db = get_db()
