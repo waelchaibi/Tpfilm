@@ -160,3 +160,35 @@ def delete_user(user_id: int) -> None:
     db.commit()
 
 
+# Admin helpers
+def list_users(search: Optional[str] = None, page: int = 1, page_size: int = 20) -> tuple[list[User], bool]:
+    db = get_db()
+    offset = (page - 1) * page_size
+    params: list[Any] = []
+    where = ""
+    if search:
+        where = "WHERE email LIKE ? OR first_name LIKE ? OR last_name LIKE ?"
+        like = f"%{search}%"
+        params.extend([like, like, like])
+    rows = db.execute(
+        f"SELECT * FROM users {where} ORDER BY created_at DESC LIMIT ? OFFSET ?",
+        (*params, page_size, offset)
+    ).fetchall()
+    users = [row_to_user(r) for r in rows if r]
+    total = db.execute(
+        f"SELECT COUNT(*) AS c FROM users {where}",
+        tuple(params)
+    ).fetchone()["c"]
+    return users, (page * page_size) < total
+
+
+def count_users() -> int:
+    db = get_db()
+    return db.execute("SELECT COUNT(*) AS c FROM users").fetchone()["c"]
+
+
+def count_active_users() -> int:
+    db = get_db()
+    return db.execute("SELECT COUNT(*) AS c FROM users WHERE is_active = 1").fetchone()["c"]
+
+

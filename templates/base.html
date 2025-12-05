@@ -39,6 +39,9 @@
                 <a href="{{ url_for('users.login') }}">Se connecter</a>
                 <a href="{{ url_for('users.profile') }}">Profil</a>
                 <a href="{{ url_for('movie.movies') }}">Voir Films</a>
+                {% if current_user.is_authenticated and current_user.role == 'admin' %}
+                    <a href="{{ url_for('admin.dashboard') }}">Admin</a>
+                {% endif %}
             </div>
         </nav>
 
