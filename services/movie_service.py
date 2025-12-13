@@ -197,3 +197,60 @@ class movieService:
             FROM movies
         """).fetchone()
         return dict(stats)
+
+    # Admin CRUD helpers
+    def list_movies(self, search: str | None, page: int = 1, page_size: int = 20) -> tuple[list[movie], bool]:
+        db = get_db()
+        offset = (page - 1) * page_size
+        params = []
+        where = ""
+        if search:
+            where = "WHERE title LIKE ? OR director LIKE ? OR cast LIKE ?"
+            like = f"%{search}%"
+            params.extend([like, like, like])
+        rows = db.execute(
+            f"SELECT * FROM movies {where} ORDER BY title ASC LIMIT ? OFFSET ?",
+            (*params, page_size, offset)
+        ).fetchall()
+        movies_list = [
+            movie(**{k: r[k] for k in r.keys()}, omdb_data_available=bool(r['omdb_data_available']))
+            for r in rows
+        ]
+        total = db.execute(f"SELECT COUNT(*) AS c FROM movies {where}", tuple(params)).fetchone()["c"]
+        return movies_list, (page * page_size) < total
+
+    def create_movie(self, data: dict) -> None:
+        db = get_db()
+        db.execute("""
+            INSERT INTO movies (
+                show_id, type, title, director, cast, country, date_added, release_year,
+                rating, duration, listed_in, description
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            data.get("show_id"), data.get("type"), data.get("title"), data.get("director"),
+            data.get("cast"), data.get("country"), data.get("date_added"), data.get("release_year"),
+            data.get("rating"), data.get("duration"), data.get("listed_in"), data.get("description")
+        ))
+        db.commit()
+
+    def update_movie(self, show_id: str, updates: dict) -> None:
+        if not updates:
+            return
+        db = get_db()
+        fields = []
+        values = []
+        for key in ["type", "title", "director", "cast", "country", "date_added", "release_year",
+                    "rating", "duration", "listed_in", "description"]:
+            if key in updates and updates[key] is not None:
+                fields.append(f"{key} = ?")
+                values.append(updates[key])
+        if not fields:
+            return
+        values.append(show_id)
+        db.execute(f"UPDATE movies SET {', '.join(fields)} WHERE show_id = ?", tuple(values))
+        db.commit()
+
+    def delete_movie(self, show_id: str) -> None:
+        db = get_db()
+        db.execute("DELETE FROM movies WHERE show_id = ?", (show_id,))
+        db.commit()

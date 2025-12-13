@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-3">
+  {% if form_mode == 'create' %}Créer un utilisateur{% else %}Modifier l'utilisateur{% endif %}
+</h2>
+<form method="post" class="row g-3" style="max-width: 640px;">
+  <div class="col-md-6">
+    <label class="form-label">Email</label>
+    <input class="form-control" name="email" type="email" value="{{ user.email if user else '' }}" required>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Rôle</label>
+    <select class="form-select" name="role">
+      <option value="user" {% if user and user.role == 'user' %}selected{% endif %}>user</option>
+      <option value="admin" {% if user and user.role == 'admin' %}selected{% endif %}>admin</option>
+    </select>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Prénom</label>
+    <input class="form-control" name="first_name" value="{{ user.first_name if user else '' }}">
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Nom</label>
+    <input class="form-control" name="last_name" value="{{ user.last_name if user else '' }}">
+  </div>
+  <div class="col-12">
+    <label class="form-label">Mot de passe {% if form_mode == 'edit' %}(laisser vide pour ne pas changer){% endif %}</label>
+    <input class="form-control" name="password" type="password" {% if form_mode == 'create' %}required{% endif %}>
+  </div>
+  <div class="col-12 form-check">
+    <input class="form-check-input" name="is_active" type="checkbox" id="is_active" {% if not user or user.is_active %}checked{% endif %}>
+    <label class="form-check-label" for="is_active">Actif</label>
+  </div>
+  <div class="col-12">
+    <button class="btn btn-primary" type="submit">Enregistrer</button>
+    <a class="btn btn-secondary" href="{{ url_for('admin.users_list') }}">Annuler</a>
+  </div>
+</form>
+{% endblock %}
+

@@ -4,6 +4,7 @@ from flask_login import LoginManager, current_user
 import os
 from routes import main, users
 from routes.movie_route import create_movie_blueprint
+from routes.admin import create_admin_blueprint
 from services.database_service import get_db
 from services.user_service import get_user_by_id
 from services.movie_service import movieService
@@ -42,6 +43,7 @@ def create_app():
         movie_service.seed_movies_from_csv('./data/netflix_titles.csv')
     
         app.register_blueprint(create_movie_blueprint(movie_service))
+        app.register_blueprint(create_admin_blueprint(movie_service))
     return app
 
 app = create_app()

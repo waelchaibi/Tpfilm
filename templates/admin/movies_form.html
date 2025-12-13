@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-3">
+  {% if form_mode == 'create' %}Créer un film{% else %}Modifier le film{% endif %}
+</h2>
+<form method="post" class="row g-3" style="max-width: 800px;">
+  <div class="col-md-4">
+    <label class="form-label">Show ID</label>
+    <input class="form-control" name="show_id" value="{{ movie.show_id if movie else '' }}" {% if form_mode == 'edit' %}readonly{% else %}required{% endif %}>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Type</label>
+    <input class="form-control" name="type" value="{{ movie.type if movie else '' }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Titre</label>
+    <input class="form-control" name="title" value="{{ movie.title if movie else '' }}" required>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Réalisateur</label>
+    <input class="form-control" name="director" value="{{ movie.director if movie else '' }}">
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Cast</label>
+    <input class="form-control" name="cast" value="{{ movie.cast if movie else '' }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Pays</label>
+    <input class="form-control" name="country" value="{{ movie.country if movie else '' }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Date ajout</label>
+    <input class="form-control" name="date_added" value="{{ movie.date_added if movie else '' }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Année</label>
+    <input class="form-control" name="release_year" type="number" value="{{ movie.release_year if movie else '' }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Rating</label>
+    <input class="form-control" name="rating" value="{{ movie.rating if movie else '' }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Durée</label>
+    <input class="form-control" name="duration" value="{{ movie.duration if movie else '' }}">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Catégories</label>
+    <input class="form-control" name="listed_in" value="{{ movie.listed_in if movie else '' }}">
+  </div>
+  <div class="col-12">
+    <label class="form-label">Description</label>
+    <textarea class="form-control" name="description" rows="3">{{ movie.description if movie else '' }}</textarea>
+  </div>
+  <div class="col-12">
+    <button class="btn btn-primary" type="submit">Enregistrer</button>
+    <a class="btn btn-secondary" href="{{ url_for('admin.movies_list') }}">Annuler</a>
+  </div>
+</form>
+{% endblock %}
+

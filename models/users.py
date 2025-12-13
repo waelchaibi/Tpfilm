@@ -1,28 +1,29 @@
 from typing import Optional, Dict, Any
 from dataclasses import dataclass
+from flask_login import UserMixin
 from services.database_service import get_db
 
 
 @dataclass
-class User:
+class User(UserMixin):
     user_id: int
     email: str
-    first_name: Optional[str]
-    last_name: Optional[str]
-    age: Optional[int]
-    gender: Optional[str]
-    country: Optional[str]
-    state_province: Optional[str]
-    city: Optional[str]
-    subscription_plan: Optional[str]
-    subscription_start_date: Optional[str]  
-    is_active: int  
-    monthly_spend: Optional[float]
-    primary_device: Optional[str]
-    household_size: Optional[int]
-    created_at: str
-    role: str
-    password_hash: str
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    age: Optional[int] = None
+    gender: Optional[str] = None
+    country: Optional[str] = None
+    state_province: Optional[str] = None
+    city: Optional[str] = None
+    subscription_plan: Optional[str] = None
+    subscription_start_date: Optional[str] = None
+    is_active: int = 1
+    monthly_spend: Optional[float] = None
+    primary_device: Optional[str] = None
+    household_size: Optional[int] = None
+    created_at: str = ""
+    role: str = "user"
+    password_hash: str = ""
 
     def to_public_dict(self) -> Dict[str, Any]:
         return {
@@ -48,6 +49,15 @@ class User:
     # Flask-Login compatibility
     def get_id(self) -> str:
         return str(self.user_id)
+
+    @property
+    def is_authenticated(self) -> bool:
+        # Flask-Login requires this attribute; returning True for loaded users
+        return True
+
+    @property
+    def is_anonymous(self) -> bool:
+        return False
 
 
 def initialize_users_table() -> None:

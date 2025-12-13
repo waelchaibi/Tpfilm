@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="mb-4">Admin Dashboard</h1>
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Utilisateurs</h5>
+        <p class="card-text mb-1">Total: {{ total_users }}</p>
+        <p class="card-text">Actifs: {{ active_users }}</p>
+        <a href="{{ url_for('admin.users_list') }}" class="btn btn-primary btn-sm">Gérer les utilisateurs</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Films</h5>
+        <p class="card-text mb-1">Total: {{ movie_stats.total_movies }}</p>
+        <p class="card-text mb-1">Consolidés: {{ movie_stats.consolidated_movies }}</p>
+        <p class="card-text">Taux consolidation: {{ '%.1f'|format(movie_stats.consolidation_rate) }}%</p>
+        <a href="{{ url_for('admin.movies_list') }}" class="btn btn-primary btn-sm">Gérer les films</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
